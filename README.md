@@ -1,2 +1,2 @@
 # LatexRepository
-fake repository for experiments with LaTeX
+repository for various experiments with LaTeX
