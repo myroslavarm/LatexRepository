@@ -1,5 +1,23 @@
 \documentclass[format=sigconf]{acmart}
 
+\usepackage{xcolor} %%% for comments
+\usepackage{ifthen} %%% for comments
+\usepackage{ulem} %%% for striked out text
+
+% comments \nb{label}{color}{text}
+\newboolean{showcomments}
+\setboolean{showcomments}{true}
+\ifthenelse{\boolean{showcomments}}
+	{\newcommand{\nb}[3]{
+		{\colorbox{#2}{\bfseries\sffamily\scriptsize\textcolor{white}{#1}}}
+		{\textcolor{#2}{\sf\small$\blacktriangleright$\textit{#3}$\blacktriangleleft$}}}
+	 \newcommand{\version}{\emph{\scriptsize$-$Id$-$}}}
+	{\newcommand{\nb}[3]{}
+	 \newcommand{\version}{}}
+\newcommand{\md}[1]{\nb{Marcus}{red}{#1}}
+\newcommand{\oz}[1]{\nb{Oleks}{olive}{#1}}
+\newcommand{\mr}[1]{\nb{Myroslava}{teal}{#1}}
+
 \AtBeginDocument{%
   \providecommand\BibTeX{{%
     \normalfont B\kern-0.5em{\scshape i\kern-0.25em b}\kern-0.8em\TeX}}}
@@ -13,73 +31,32 @@
 \begin{document}
 
 \begin{abstract}
-  \par
-  Code completion is one of the most essential features of any IDE.
-  A good code completion tool can greatly improve the developer experience,
-  whereas poor autocompletion can hinder the progress and discourage
-  developers. Thus, it is important to find a way to make it as effective
-  as possible. Specifically, in the case of Pharo, same name for a Smalltalk-like
-  language and an open-source IDE, in the last year and a half a lot of work
-  has been carried out to improve code completion. However, there are more
-  potential improvements from which developers can only benefit: saving time
-  and effort spent while coding remains an open question, and improving the
-  relevance of suggestions and hence reducing time the developer takes to go
-  through the list seem promising.
+\oz{Ask Stephane if you should add an affiliation with Inria and RMoD}
+\oz{This abstract is too long. Consider splitting it into Abstract and Introduction}
+Code completion is one of the \oz{\sout{most}} essential features of any IDE\oz{ that greatly improves\sout{. A good code completion tool can greatly improve}} the developer experience\oz{\sout{,whereas poor autocompletion can hinder the progress and discourage developers}}. Thus, it is important to find a way to make it as effective as possible. Specifically, in the case of Pharo\oz{\sout{, same name for a Smalltalk-like language and an open-source} programming language and} IDE, in the last year and a half a lot of work has been carried out to improve code completion. However, there are more potential improvements from which developers can only benefit: \oz{this makes no sense, try to rephrase it: \sout{saving time and effort spent while coding remains an open question, and improving the relevance of suggestions and hence reducing time the developer takes to go through the list seem promising.}}
 
-  In Pharo, the existing autocompletion implementation so far only allows for
-  alphabetical sorting of results. While this approach is mostly usable, it
-  completely ignores the potential of suggesting completion results based
-  on code history and analysis, which is something that has been successfully
-  adopted by other IDEs. Thus, in this work I intend to study how code
-  completion in Pharo can be improved by using machine learning and statistical
-  language models. In particular, the idea is to use the N-gram model, as it
-  has been documented to be used for such a task, and, if successfully adapted
-  to Pharo, might help enhance the code completion quality in general and the
-  relevance of proposed completions in particular.
+\oz{\sout{In Pharo, the existing autocompletion implementation so far only allows for alphabetical sorting of results.} The current implementation of code completion in Pharo sorts the proposed completions alphabetically.} \oz{Mention that it makes use of the AST, class, etc.}\oz{\sout{While this approach is mostly usable, it} This approach} \oz{\sout{completely }}ignores the potential of suggesting completion results based on code history\oz{\sout{ and analysis} What analysis?}, which is something that has been successfully adopted by other IDEs. \oz{\sout{Thus, }}in this work I intend to study how code completion in Pharo can be improved \oz{\sout{by }}using machine learning and statistical language models. In particular, the idea is to use the N-gram model, as it has been documented to be used for such a task, and, if successfully adapted to Pharo, might help enhance the \oz{quality of code completion. \sout{code completion quality in general and the relevance of proposed completions in particular} What is the difference between completion quality and relevance?}
 
-  There are many approaches to handling the process of completing code. The classic
-  strategies have been to use lexical models (completing based on the prefix the user
-  is typing) or to use semantic models (use code structure analysis information to
-  tailor completions). In the latest years statistical, or machine learning, models
-  have also gained popularity. For the most part when using ML, source code analysis
-  is also often disregarded in lieu of simply training the model on the code base and
-  inferring all the possible code dependencies from that.
+There are many approaches to handling the process of completing code. The classic strategies \oz{\sout{have been to }}use lexical models (completing based on the prefix the user is typing) or \oz{\sout{to use }}semantic models (use code structure analysis information to tailor completions). In the latest years statistical\oz{\sout{,}} or machine learning\oz{\sout{,}} models have also gained popularity\oz{They are not the same thing}. For the most part when using ML, source code analysis is also often disregarded \oz{\sout{in lieu}instead} of simply training the model on the code base and inferring all the possible code dependencies from that \oz{I don't understand this last sentence}.
 
-  The famous paper "On The Naturalness of Software" (Hindle et al.) served as a sort
-  of catalyst for the following research, applying statistical models to Pharo.
-  There, as well as in “On the localness of software” (Tu et al.), “Code completion
-  with statistical language models” (Raychev et al.), “Are deep neural networks the
-  best choice for modeling source code?” (Hellendoorn et al.) and “Code completion
-  with neural attention and pointer networks” (Li et al.), the structural information
-  is not taken into consideration and the problem of improving code completion is
-  reduced to a natural language processing problem, where predicting the next token
-  is treated as predicting the next word in a sentence.
+\oz{Don't write the title of every paper, simply cite them and titles will appear in references} \oz{My work was inspired by } The \oz{\sout{famous}} paper "On The Naturalness of Software" \oz{\sout{( by}} Hindle et al.\oz{\sout{)}} \cite{Hind12a} \oz{\sout{served as a sort of catalyst for the following research, applying statistical models to Pharo}}. There, as well as in \oz{\sout{"On the localness of software" (Tu et al.), "Code completion with statistical language models" (Raychev et al.), "Are deep neural networks the best choice for modeling source code?" (Hellendoorn et al.) and "Code completion with neural attention and pointer networks" (Li et al.)}}\cite{Tu14a,Rayc14a,Hell17a,Li17a}, the structural information is not taken into consideration and the problem of improving code completion is reduced to a natural language processing problem, where predicting the next token is treated as predicting the next word in a sentence.
 
-  The n-gram language model approach proposed by Hindle et al. is based on capturing
-  high-level statistical regularity at the n-gram level by taking n-1 previous tokens
-  that are already entered into the text buffer, and attempting to guess the next
-  token. Using this model, it is possible to estimate the most probable sequences of
-  tokens and suggest the most relevant code completions to developers.
+The n-gram language model approach proposed by Hindle et al. is based on capturing \oz{\sout{high-level statistical regularity} What does it mean?} at the n-gram level by taking n-1 previous tokens that are already entered into the text buffer, and attempting to guess the next token. Using this model, it is possible to estimate the most probable sequences of tokens and suggest the most relevant code completions to developers.\oz{Make it more clear that your work is different from the work of Hindle et al. and explain why it is different}
 
-  Therefore, in Pharo our idea is to have a sorting strategy based on an n-gram model,
-  on top of the actual completion engine that works by analysing AST information of the
-  source code, having actually utilised structural information. In this case, we are
-  able to get semantically-appropriate results based on type whenever possible, and
-  then sorting the results by relevance will help suggest much more accurate tokens for
-  when the type is not known (as Pharo is a dynamically typed language).
+Therefore, in Pharo our idea is to have a sorting strategy based on an n-gram model, on top of the actual completion engine that works by analysing AST information of the source code, having \oz{\sout{actually}} utilised structural information\oz{What is structural information and how do you utilise it?}. In this case, we are able to get semantically-appropriate results based on type whenever possible, and then sort\oz{\sout{ing}} the results by relevance \oz{\sout{will help} which allows us to} suggest much more accurate tokens for when the type is not known\oz{\oz{ (as Pharo is a dynamically typed language)} You can mention that at the beginning of the sentence}.
 
-  The goal of this will be to see:
-  \begin{itemize}
-    \item whether we can improve code completion in Pharo by sorting candidate
-    completions with an n-gram language model
-    \item whether we can build a tool based on a trained n-gram model that would
-    propose completion fast enough to be used in an IDE
-    \item how can we numerically evaluate the results of code completion produced
-    by different completion strategies
-  \end{itemize}
-  \par
+\oz{\sout{The goal of this will be to see}The contributions of this work are the following}:
+\begin{itemize}
+  \item \oz{\sout{whether we can }}improve code completion in Pharo by sorting candidate completions with an n-gram language model
+  \item \oz{\sout{whether we can }}build a tool based on a trained n-gram model that would propose completion fast enough to be used in an IDE
+  \item \oz{\sout{how can we} Propose a methodology to } numerically evaluate the results of code completion produced by different completion strategies
+\end{itemize}
+
 \end{abstract}
 
 \maketitle
+
+\bibliographystyle{acm}
+\bibliography{rmod,others}
 
 \end{document}

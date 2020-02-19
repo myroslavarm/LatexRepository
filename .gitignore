@@ -10,7 +10,7 @@
 *.bbl
 *.log
 *.out
-*.pdf
+#*.pdf
 *.ps
 *.blg
 *.toc
