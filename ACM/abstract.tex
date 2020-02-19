@@ -32,10 +32,9 @@ in Pharo \footnote{https://pharo.org/}. In particular, the goal is to use n-gram
 sorting the completion candidates and in such a way increase the relevancy of untyped suggestions.
 
 \section{Introduction}
-\oz{Ask Stephane if you should add an affiliation with Inria and RMoD}
 Code completion is one of the essential features of any IDE that greatly improves the
-developer experience. Thus, it is important to find a way to make it as effective as
-possible. Specifically, in the case of Pharo, a dynamically-typed programming language
+developer experience and productivity. Thus, it is important to find a way to make it as effective as
+possible. Specifically, in the case of Pharo, a dynamically-typed Smalltalk-based programming language
 and IDE, in the last year and a half a lot of work has been carried out to improve code
 completion. However, there are more potential improvements from which developers can only
 benefit, such as improving the relevance of suggestions and hence reducing time and
@@ -99,7 +98,7 @@ and among each other.
 In this paper we proposed applying n-gram language models when sorting completion candidates
 in Pharo. Having an AST-based completion engine, we are not always able to infer type information
 from the nodes, and hope to compensate for it and improve the relevance of suggestions by
-implementing a fast n-gram based sorting to be used in the Pharo IDE.
+implementing a fast n-gram based sorting functionality to be used in the Pharo IDE.
 
 \end{abstract}
 
