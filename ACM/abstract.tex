@@ -18,7 +18,8 @@
 \newcommand{\oz}[1]{\nb{Oleks}{olive}{#1}}
 \newcommand{\mr}[1]{\nb{Myroslava}{teal}{#1}}
 
-\title{Usage of N-gram models to improve autocompletion in Pharo}
+\title{Improving Code Completion in Pharo\\Using N-gram Language Models}
+%\title{Usage of N-gram models to improve autocompletion in Pharo}
 \author{Myroslava Romaniuk}
 \affiliation{\institution{Ukrainian Catholic University}}
 \email{romaniuk@ucu.edu.ua}
@@ -38,7 +39,7 @@ There are many approaches to handling the process of completing code. The classi
 
 The n-gram language model approach proposed by Hindle et al. is based on capturing \oz{\sout{high-level statistical regularity} What does it mean?} at the n-gram level by taking n-1 previous tokens that are already entered into the text buffer, and attempting to guess the next token. Using this model, it is possible to estimate the most probable sequences of tokens and suggest the most relevant code completions to developers.\oz{Make it more clear that your work is different from the work of Hindle et al. and explain why it is different}
 
-Therefore, in Pharo our idea is to have a sorting strategy based on an n-gram model, on top of the actual completion engine that works by analysing AST information of the source code, having \oz{\sout{actually}} utilised structural information\oz{What is structural information and how do you utilise it?}. In this case, we are able to get semantically-appropriate results based on type whenever possible, and then sort\oz{\sout{ing}} the results by relevance \oz{\sout{will help} which allows us to} suggest much more accurate tokens for when the type is not known\oz{\oz{ (as Pharo is a dynamically typed language)} You can mention that at the beginning of the sentence}.
+Therefore, in Pharo our idea is to have a sorting strategy based on an n-gram model, on top of the actual completion engine that works by analysing AST information of the source code, having \oz{\sout{actually}} utilised structural information\oz{What is structural information and how do you utilise it?}. In this case, we are able to get semantically-appropriate results based on type whenever possible, and then sort\oz{\sout{ing}} the results by relevance \oz{\sout{will help} which allows us to} suggest much more accurate tokens for when the type is not known\oz{\sout{ (as Pharo is a dynamically typed language)} You can mention that at the beginning of the sentence}.
 
 \oz{\sout{The goal of this will be to see}The contributions of this work are the following}:
 \begin{itemize}
