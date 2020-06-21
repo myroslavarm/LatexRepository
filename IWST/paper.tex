@@ -76,46 +76,27 @@ It is worth noting that the majority of the research experiments mentioned in th
 The only related works in this chapter where the experiments included dynamically typed languages were: \cite{Robb08a} (Smalltalk, in addition to Java), \cite{Tu14a} (Python, in addition to Java), \cite{Li17a} (Javascript and Python), and \cite{Svya19a} (Python).
 
 \section{Completion in Pharo}
-In this chapter, I give a detailed overview of the current completion engine in the Pharo IDE, as well as describe the challenges of code completion for a dynamically typed language, and the idea behind the sorter plugin.
-
 \subsection{Code Completion Background}
 The Pharo programming language is an object-oriented dynamically typed programming language which is inspired by Smalltalk. The Pharo IDE is a programming environment meant specifically for developing in Pharo. It consists of a virtual machine (VM), on top of which an image, serving as the current IDE workspace, can be run.
 
 The Pharo IDE itself is written in Pharo and can be extended from within. This means that when implementing code completion, one can test it live in the very environment where one is developing it, which, if not done carefully, can lead to breaking the system.
 
-Code completion in the Pharo IDE is called at every keystroke, as soon as two and more alphabetic characters are typed in. A completion context gets created for the text typed in until then, regardless of the type of the code editor. And there are several code editor tools within the Pharo IDE, such as:
-\begin{itemize}
-    \item the Playground, which is a tool for generating small scripts and sketching out some code
-    \item the System Browser, a tool which allows one to browse classes and methods and has a dedicated code area for writing and editing code
-    \item the Debugger, a specialised code editor for editing code during debugging
-\end{itemize}
+Code completion in the Pharo IDE is called at every keystroke, as soon as two and more alphabetic characters are typed in. A completion context gets created for the text typed in until then, regardless of the type of the code editor. And there are several code editor tools within the Pharo IDE, such as the Playground, the System Browser, and the Debugger.
 
 \subsection{Typing for Completion in Dynamic Languages}
 As Pharo is a dynamically typed language, the precise type information is only available at runtime. Not knowing the type when writing code can make the completion suggestions less precise and push relevant options to the bottom of the list of completions, which then requires scrolling or typing more characters.
 
-There are a couple of approaches one could take to solve this. The first is type\footnote{\textit{Type} meaning a kind of variable, instead of an act of writing something by pressing the keys. Throughout this text the word is often used in either one of the meanings, depending on context.} inference (or rather type reconstruction), which can be done by extracting type information by looking at the messages sent to a variable, and merging these results with types found by heuristics applied to the right-hand side of assignment expressions (\cite{Pluq09a}). Type guessing by means of name analysis can also be done, but it is more likely to be misleading. The third approach involves the AST-based completion in the Pharo IDE (more details in the next section). It performs a semantic analysis of source code, which provides us with more accurate type information for certain kinds of nodes.
+There are a couple of approaches one could take to solve this. The first is type\footnote{\textit{Type} meaning a kind of variable, instead of an act of writing something by pressing the keys. Throughout this text the word is often used in either one of the meanings, depending on context.} inference, or reconstruction, which can be done by extracting type information by looking at the messages sent to a variable, and merging these results with types found by heuristics applied to the right-hand side of assignment expressions \cite{Pluq09a}. Type guessing by means of name analysis can also be done, but it is more likely to be misleading. The third approach involves the AST-based completion in the Pharo IDE. It performs a semantic analysis of source code, which provides us with more accurate type information for certain kinds of nodes.
 
 \subsection{AST-Based Completion}
 The completion context parses the text and transforms it into the AST representation, such as a sequence of AST nodes. In the process, all the information needed for further actions is extracted: e.g. the current position of the cursor (where we want to get the completion) and the class which we are currently modifying (or information that the completion happens in the Playground, for which there is no such data). By performing the semantic analysis, we get the most suitable type of node for each part of code, and then visit each node to get the correct completion behaviour (i.e. contextually appropriate suggestions). For instance, this means that for a Global node, we want to suggest all the globals, such as class names, for a Message node we only want to get message sends to a variable, and so on.
 
-Combining the available prefix of length at least 2, as well as relevant semantic information, we give a list of suitable completion suggestions that are then passed to the sorter. The list itself is displayed in a completion menu that pops up once the completion is called and then is updated with every new keystroke, unless the developer\footnote{Developer in the Pharo IDE, who is a user of code completion.} cancels it by pressing \textit{Esc} or clicking outside of the text area. The completion window can also disappear once there are no valid suggestions to give anymore.
+Combining the available prefix of length at least 2, as well as relevant semantic information, we give a list of suitable completion suggestions that are then passed to the sorter. The list itself is displayed in a completion menu that pops up once the completion is called and then is updated with every new keystroke, unless the developer cancels it by pressing \textit{Esc} or clicking outside of the text area. The completion window can also disappear once there are no valid suggestions to give anymore.
 
 \subsection{Sorter Plugin}
-The sorter plugin is an important part of the code completion tool in the Pharo IDE. It is responsible for the final order in which the completions are presented. Within the sorter, we treat the completion implementation as a black box. The only information it receives is the list of completions to be sorted, as well as the completion context (meaning any other completion-related information, such as the AST node, the cursor position, the class where the completion happens, and so on). This was done to make the sorter extendable and open for modification, so that anyone would be able to implement and plug in a sorting strategy they would like to have.
-
-Ultimately, this means that the way we get the completion results is the same every time (i.e. we get contextually suitable completions as a result of analysing the AST). However, the sorting strategy vastly influences the end result (i.e. the list of suggestions displayed in the pop-up completion menu) the users (developers) see. Specifically, a good sorter can prioritise the more relevant completions that would otherwise be positioned far down the list (for example, if the type of the token being completed is not known or there is no local context, as happens in the Playground).
-
-\subsection{Summary}
-\begin{itemize}
-    \item Pharo is an object-oriented dynamically typed language inspired by Smalltalk, and the Pharo IDE is an interactive programming environment intended for developing in the Pharo language.
-    \item Code completion in the Pharo IDE is used in the code editors, the list of which includes the Playground (a scripting tool), the System Browser (a tool for browsing, writing and editing class functionality), the Debugger (a tool for editing code while in debug mode), and so on.
-    \item The current code completion implementation in the Pharo IDE is based on analysing the AST of source code; it is called after the developer types at least two alphabetic characters. The completion candidates are then suggested based on the most relevant semantic context.
-    \item Other than the completion engine, which is responsible for the process of \textit{completing} code, another important part of the code completion tool is the sorter plugin that supports implementing various sorting strategies. It is responsible for the order in which the results are displayed to the user.
-\end{itemize}
+The sorter plugin is an important part of the code completion tool in the Pharo IDE. It is responsible for the final order in which the completions are presented. Within the sorter, we treat the completion implementation as a black box. The only information it receives is the list of completions to be sorted, as well as the completion context (meaning any other completion-related information, such as the AST node, the cursor position, the class where the completion happens, and so on). Ultimately, this means that the way we get the completion results is the same every time (i.e. we get contextually suitable completions as a result of analysing the AST). However, the sorting strategy vastly influences the end result (i.e. the list of suggestions displayed in the pop-up completion menu) the users (developers) see. Specifically, a good sorter can prioritise the more relevant completions that would otherwise be positioned far down the list (for example, if the type of the token being completed is not known or there is no local context, as happens in the Playground).
 
 \section{N-gram Background}
-In this chapter, we go over the theoretical background for the n-gram models and the challenges in their implementation.
-
 \subsection{N-gram Language Models}
 Predicting the next word in a sequence is a central problem for many areas of Natural Language Processing (NLP), including speech recognition, spelling correction, spam filtering, machine translation, and others.
 
@@ -166,19 +147,7 @@ There are several smoothing algorithms, the simplest of which is Laplace smoothi
 \end{equation}
 where \textit{c} is the count of the word \textit{w} and \textit{N} is the total number of words.
 
-\subsection{Summary}
-\begin{itemize}
-    \item Language models assign probabilities to sentences and sequences of words, and can be used to predict the next word in a sequence.
-    \item N-gram language models calculate conditional probabilities of words in a corpus given a limited history of \textit{n-1} previous words.
-    \item The joint probability of a sequence is a product of each words' probability.
-    \item N-gram models belong to the family of Markov models -- they make a restrictive assumption that every word in a sequence depends only on \textit{n-1} previous words, and any words beyond that window have little effect on the probability and can be ignored.
-    \item Occasionally, there are words that are not in the vocabulary, which means their probability of occurrence will be zero, and will bring the joint probability of a sequence to zero also, ultimately hurting the performance of the model that can end up discarding perfectly valid sequences.
-    \item To solve this problem, the process of smoothing is used. That way probability is redistributed among all the words, with a little bit taken off more frequent words and given to the unknown ones.
-\end{itemize}
-
 \section{Proposed Solution}
-This chapter contains a detailed description of the final solution: data preparation, approaches taken to implement the n-gram sorters, and various engineering details.
-
 \subsection{Solution Overview}
 The objective of this implementation is the following: suggest the most likely tokens at every step of the completion process. The main idea is to leave the existing, AST-based code completion engine in place, and enhance the sorting strategy. For this, I implemented two separate sorters based on n-gram models. That means that after the list of completion candidates is proposed, it gets sorted based on each n-gram's probability so that the most relevant completions are shown first.
 
@@ -218,19 +187,7 @@ It is worth noting that both the n-gram sorters can actually be used in the Phar
 
 The unigram sorter is quite fast and accurate. However, the bigram sorter is too slow for comfortable usage, and re-engineering the implementation to be faster is left for future work.
 
-\subsection{Summary}
-\begin{itemize}
-    \item The data used to train the models came from 50 projects implemented in Pharo; in the dataset, the source code was already split into tokens and token types. In the data, delimiters and non-alphabetic tokens, as well as comments, were all considered to be separate tokens.
-    \item For unigram sorting, individual token frequencies were extracted, and the sorting of completions was based on those frequencies.
-    \item For bigram sorting, completion candidates were added to the previous token to form sequences of bigrams, whose probability was later calculated and recorded to file. The sorting was based on the sequence probability, but it was only applied to individually displayed completion candidates.
-    \item Different approaches were taken to reduce the sizes of models and to speed up lookup and sorting time; among them: cleaning up tokens with occurrences below a certain threshold, and replacing "one-time" tokens (such as specific strings, numbers, et cetera) with general placeholders (such as <str>, <num>).
-    \item In the process of working on the bigram sorting strategy, the NgramModel Pharo library that was used for this approach was additionally extended with new functionality, such as reading/writing to file and reducing the number of sequences with counts below a certain threshold.
-    \item Finally, both sorting strategies can be used in the Pharo IDE. However, the bigram sorter remains too slow for comfortable day-to-day usage.
-\end{itemize}
-
 \section{Evaluation}
-In this chapter, we go over different approaches and challenges for evaluating code completion, as well as analyse the results from the evaluation experiments for this project.
-
 \subsection{Evaluation Overview}
 Evaluation is an essential part of any research process. In the Richard Feynman quote above, the evaluation \textit{is} the experiment he is referring to. To paraphrase and make it more relevant to software engineering, it does not matter what kind of tool you implemented and how well do you think it works, there need to be clear metrics the implementation is measured on and a clear definition of what is considered to be a successful evaluation.
 
@@ -339,15 +296,6 @@ In the Table~\ref{table:qual2} we can see that the alphabetic sorter once again 
 \end{description}
 
 To briefly sum up the results of the manual qualitative evaluation, the unigram sorter still seems to be the best one out of the three, the same as in the quantitative evaluation. However, as seen in these examples, the bigram sorter is not very far behind, also more often than not prioritising the desired completions, which disagrees with the quantitative evaluation. So, while based on raw data the bigram sorter is the worst of the three \textit{on average}, from the manual evaluation it seems that it gives perfectly adequate results for examples that would be commonly encountered in Pharo. Thus, as part of the future work, it would be useful to investigate what exactly are the cases decreasing the bigram sorter's average accuracy, or, in other words, to find out what is the issue and what can be done to fix it.
-
-\subsection{Summary}
-\begin{itemize}
-    \item Quantitative evaluation involves benchmarking the model and calculating performance scores. In contrast, the qualitative approach involves conducting the evaluation via letting people test the tool, observing the human-computer interaction, recording feedback interviews, and so on.
-    \item There are certain challenges in evaluating code completion, which can be divided into three main categories: resources limitation, finding appropriate metrics, and reproducibility.
-    \item Based on the evaluation tool that I created and used to evaluate average success rate (i.e. out of all the attempts to complete the history, how many of them had the expected match in the first 10 results) for each sorting strategy, the unigram sorter performed better than the alphabetic sorter but, surprisingly, the bigram one performed worse.
-    \item For the qualitative evaluation, 10 completion cases were preselected for their common occurrence when coding in the Pharo IDE, with no bias towards any sorting strategy. The examples were tested in the real environment, and the positions of the desired completion suggestions were recorded for each of them. Using this evaluation, the unigram approach was once again the best, but on the cases tested, the bigram approach did not seem to perform so badly.
-    \item Based on this, as part of future work, I plan to investigate the potential issues with the bigram implementation and try to enhance its performance.
-\end{itemize}
 
 \section{Conclusion}
 In this work, I proposed a machine learning-based technique for improving the completion engine in the Pharo IDE. The exact implementation uses the n-gram language models to sort the completion candidates that are suggested to the user as they type. Specifically, I implemented two sorting strategies: one based on the unigram model and another on the bigram model.
